@@ -11,9 +11,9 @@ function Topbar({
   elements?: { left?: ReactElement; right?: ReactElement };
 }) {
   return (
-    <header className="sticky top-0 z-50 grid grid-cols-[1fr, 2fr, 1fr] bg-white p-4">
+    <header className="sticky top-0 z-50 grid grid-cols-[1fr_2fr_1fr] bg-white px-4 py-3">
       <div className="mr-auto flex">{left}</div>
-      <div className="flex w-full items-center justify-center text-center text-lg font-semibold">
+      <div className="flex w-full items-center justify-center text-center text-lg font-semibold text-gray-800">
         {title}
       </div>
       <div className="ml-auto flex">{right}</div>
@@ -27,7 +27,7 @@ Topbar.Back = function Back({ href }: { href?: string }) {
   return (
     <a
       onClick={() => (href ? router.push(href) : router.back())}
-      className="w-fit flex items-center align-middle"
+      className="flex items-center justify-center"
     >
       <I.Back />
     </a>
