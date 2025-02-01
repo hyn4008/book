@@ -12,6 +12,12 @@ export default {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
+      fontFamily: {
+        jua: "var(--font-jua)",
+        gothic: "var(--font-gothic)",
+        nunito: "var(--font-nunito)",
+        quicksand: "var(--font-quicksand)",
+      },
     },
   },
   plugins: [],
