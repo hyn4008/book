@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Topbar from "../../components/topbar";
 import Thumbnail from "../../public/thumbnail.jpeg";
-import Banner from "../../public/banner.jpeg";
+// import Banner from "../../public/banner.jpeg";
 import Image from "next/image";
 import { Reservation, Parking, Wifi, Pet } from "../../components/icons";
 import Jan1 from "./_static/2025_01_1.jpeg";

@@ -2,6 +2,7 @@
 import type { ReactElement } from "react";
 import { useRouter } from "next/navigation";
 import * as I from "../icons";
+import Link from "next/link";
 
 function Topbar({
   title,
@@ -11,26 +12,34 @@ function Topbar({
   elements?: { left?: ReactElement; right?: ReactElement };
 }) {
   return (
-    <header className="fixed top-0 z-100 grid grid-cols-[1fr_2fr_1fr] bg-white border px-4 py-3 w-full">
-      <div className="mr-auto flex">{left}</div>
-      <div className="flex w-full items-center justify-center text-center text-lg font-semibold text-gray-800">
+    <header className="fixed top-0 z-100 flex items-center bg-white border px-4 py-3 w-full">
+      <div className="flex w-full justify-start">{left}</div>
+      <div className="flex w-full justify-center text-lg font-semibold text-gray-800">
         {title}
       </div>
-      <div className="ml-auto flex">{right}</div>
+      <div className="flex w-full justify-end">{right}</div>
     </header>
   );
 }
 
-Topbar.Back = function Back({ href }: { href?: string }) {
+Topbar.Back = function Back() {
   const router = useRouter();
 
   return (
-    <a
-      onClick={() => (href ? router.push(href) : router.back())}
-      className="flex items-center justify-center"
+    <div
+      onClick={() => router.back()}
+      className="flex items-center justify-start"
     >
       <I.Back />
-    </a>
+    </div>
+  );
+};
+
+Topbar.Check = function Check() {
+  return (
+    <Link href="/check">
+      <I.Calendar />
+    </Link>
   );
 };
 

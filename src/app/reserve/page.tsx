@@ -1,12 +1,14 @@
 "use client";
 import Link from "next/link";
 import Topbar from "../../../components/topbar";
-import { User, Time, Menu, Notice } from "../../../components/icons";
+import * as I from "../../../components/icons";
 import { useState, useEffect } from "react";
 import Datepicker from "react-tailwindcss-datepicker";
 
 export default function Page() {
+  const [isOpen, setIsOpen] = useState(false);
   const [date, setDate] = useState(new Date());
+  const [time, setTime] = useState("10:00");
   const [disabledDates, setDisabledDates] = useState([]);
   const [menu, setMenu] = useState({
     option: [] as number[],
@@ -60,91 +62,99 @@ export default function Page() {
 
   return (
     <div className="flex flex-col h-screen">
-      <Topbar title={"Étoile Nail"} />
+      <Topbar title={"Étoile Nail"} elements={{ left: <Topbar.Back /> }} />
       <main className="flex flex-col gap-y-8 pt-8 px-4 bg-gray-50">
         <div className="flex flex-col gap-y-8">
-          <div className="flex flex-col gap-y-4">
-            <div className="flex gap-x-1.5">
-              <User />
+          <div className="flex flex-col gap-y-2">
+            <div className="flex items-center gap-x-1.5">
+              <div className="rounded-full h-5 w-5 bg-cyan-500 flex items-center justify-center">
+                <span className="text-white text-sm font-semibold">1</span>
+              </div>
               <div className="font-sans font-medium text-gray-900">
                 예약자 정보를 입력해주세요
               </div>
             </div>
-            <div className="flex flex-col gap-y-4 pl-0.5">
+            <div className="flex flex-col gap-y-4 bg-white border border-cyan-500/40 rounded-lg shadow-md px-4 py-4">
               <div className="flex flex-col gap-y-2">
                 <div className="flex gap-x-1.5">
-                  <div className="w-1/5 font-sans font-semibold text-gray-700">
+                  <div className="w-1/6 font-sans font-medium text-gray-700">
                     성함
                   </div>
+                  <div className="text-gray-500">|</div>
                   <input
                     type="text"
-                    placeholder="이름을 입력해주세요"
+                    placeholder=" 이름을 입력해주세요"
                     className="w-full bg-gray-50"
                   />
                 </div>
-                <div className="border border-gray-200" />
               </div>
               <div className="flex flex-col gap-y-2">
                 <div className="font-sans text-gray-700">
                   <div className="flex gap-x-1.5">
-                    <div className="w-1/5 font-sans font-semibold text-gray-700">
+                    <div className="w-1/6 font-sans font-medium text-gray-700">
                       연락처
                     </div>
+                    <div className="text-gray-500">|</div>
                     <input
                       type="text"
-                      placeholder="010-0000-0000"
+                      placeholder=" 010-0000-0000"
                       className="w-full bg-gray-50"
                     />
                   </div>
                 </div>
-                <div className="border border-gray-200" />
               </div>
               <div className="flex flex-col gap-y-2">
                 <div className="font-sans text-gray-700">
                   <div className="flex gap-x-1.5">
-                    <div className="w-1/5 font-sans font-semibold text-gray-700">
+                    <div className="w-1/6 font-sans font-medium text-gray-700">
                       이메일
                     </div>
+                    <div className="text-gray-500">|</div>
                     <input
                       type="text"
-                      placeholder="example@email.com"
+                      placeholder=" example@email.com"
                       className="w-full bg-gray-50"
                     />
                   </div>
                 </div>
-                <div className="border border-gray-200" />
               </div>
             </div>
           </div>
           <div className="flex flex-col gap-y-2">
-            <div className="flex gap-x-1.5">
-              <Time />
+            <div className="flex items-center gap-x-1.5">
+              <div className="rounded-full h-5 w-5 bg-cyan-500 flex items-center justify-center">
+                <span className="text-white text-sm font-semibold">2</span>
+              </div>
               <div className="font-sans font-medium text-gray-900">
                 날짜와 시간을 선택해주세요
               </div>
             </div>
-            <Datepicker
-              useRange={false}
-              asSingle={true}
-              value={date}
-              onChange={(date) => setDate(date)}
-              minDate={new Date()}
-              disabledDates={disabledDates}
-              primaryColor={"cyan"}
-              // toggleClassName={
-              //   "absolute right-0 h-full px-3 rounded-r-lg text-cyan-500"
-              // }
-            />
-            <div className="font-sans text-gray-700">시간</div>
+            <div className="flex flex-col gap-y-4 bg-white border border-cyan-500/40 rounded-lg shadow-md px-4 py-4">
+              <Datepicker
+                useRange={false}
+                asSingle={true}
+                value={date}
+                onChange={(date) => setDate(date)}
+                minDate={new Date()}
+                disabledDates={disabledDates}
+                primaryColor={"cyan"}
+                // toggleClassName={
+                //   "absolute right-0 h-full px-3 rounded-r-lg text-cyan-500"
+                // }
+              />
+              <div>Timepicker</div>
+            </div>
           </div>
-          <div className="flex flex-col gap-y-4">
-            <div className="flex gap-x-1.5">
-              <Menu />
+          <div className="flex flex-col gap-y-2">
+            <div className="flex items-center gap-x-1.5">
+              <div className="rounded-full h-5 w-5 bg-cyan-500 flex items-center justify-center">
+                <span className="text-white text-sm font-semibold">3</span>
+              </div>
               <div className="font-sans font-medium text-gray-900">
                 원하시는 시술을 선택해주세요
               </div>
             </div>
-            <div className="flex flex-col gap-y-4 pl-0.5">
+            <div className="flex flex-col gap-y-4 bg-white border border-cyan-500/40 rounded-lg shadow-md px-4 py-4">
               <label className="flex items-center gap-x-1.5 font-sans font-medium text-gray-700">
                 <input
                   type="checkbox"
@@ -197,14 +207,18 @@ export default function Page() {
             </div>
           </div>
           <div className="flex flex-col gap-y-2">
-            <div className="flex gap-x-1.5">
-              <Notice />
+            <div className="flex items-center gap-x-1.5">
+              <div className="rounded-full h-5 w-5 bg-cyan-500 flex items-center justify-center">
+                <span className="text-white text-sm font-semibold">4</span>
+              </div>
               <div className="font-sans font-medium text-gray-900">
                 예약전 확인해주세요
               </div>
             </div>
-            <div className="font-sans text-gray-700">공지사항1</div>
-            <div className="font-sans text-gray-700">공지사항2</div>
+            <div className="flex flex-col gap-y-4 bg-white border border-cyan-500/40 rounded-lg shadow-md px-4 py-4">
+              <div className="font-sans text-gray-700">공지사항1</div>
+              <div className="font-sans text-gray-700">공지사항2</div>
+            </div>
           </div>
         </div>
         <div className="flex w-full mb-8">
