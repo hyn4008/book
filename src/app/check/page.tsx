@@ -1,15 +1,12 @@
 "use client";
 import Topbar from "../../../components/topbar";
-import { useState } from "react";
 import Link from "next/link";
 import { User } from "../../../components/icons";
 
 export default function Page() {
-  const [isOpen, setIsOpen] = useState(false);
-
   return (
     <>
-      <Topbar title={"Étoile Nail"} />
+      <Topbar title={"Étoile Nail"} elements={{ left: <Topbar.Back /> }} />
       <div className="flex flex-col h-screen justify-center px-4 pb-16 bg-black/5">
         <div className="flex flex-col gap-y-5 bg-white rounded-xl shadow-md px-5 py-5">
           <div className="flex gap-x-1.5">

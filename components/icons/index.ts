@@ -1,5 +1,5 @@
 import Back from "./back.svg";
-import Reservation from "./reserve.svg";
+import Reserve from "./reserve.svg";
 import Parking from "./parking.svg";
 import Wifi from "./wifi.svg";
 import Pet from "./pet.svg";
@@ -8,10 +8,12 @@ import Time from "./time.svg";
 import Menu from "./menu.svg";
 import Notice from "./notice.svg";
 import Calendar from "./calendar-check.svg";
+import Check from "./check.svg";
+import Change from "./change.svg";
 
 export {
   Back,
-  Reservation,
+  Reserve,
   Parking,
   Wifi,
   Pet,
@@ -20,4 +22,6 @@ export {
   Menu,
   Notice,
   Calendar,
+  Check,
+  Change,
 };

@@ -70,53 +70,43 @@ export default function Page() {
               <div className="rounded-full h-5 w-5 bg-cyan-500 flex items-center justify-center">
                 <span className="text-white text-sm font-semibold">1</span>
               </div>
-              <div className="font-sans font-medium text-gray-900">
+              <div className="font-sans font-semibold text-gray-900">
                 예약자 정보를 입력해주세요
               </div>
             </div>
-            <div className="flex flex-col gap-y-4 bg-white border border-cyan-500/40 rounded-lg shadow-md px-4 py-4">
-              <div className="flex flex-col gap-y-2">
-                <div className="flex gap-x-1.5">
-                  <div className="w-1/6 font-sans font-medium text-gray-700">
-                    성함
-                  </div>
-                  <div className="text-gray-500">|</div>
-                  <input
-                    type="text"
-                    placeholder=" 이름을 입력해주세요"
-                    className="w-full bg-gray-50"
-                  />
+            <div className="flex flex-col gap-y-4 bg-white border border-cyan-600/40 rounded-lg shadow-md px-4 py-4">
+              <div className="flex items-center gap-x-1.5">
+                <div className="w-1/6 font-sans font-medium text-gray-700">
+                  성함
                 </div>
+                <div className="text-gray-500">|</div>
+                <input
+                  type="text"
+                  placeholder="  이름을 입력해주세요"
+                  className="w-full h-8 rounded-lg bg-gray-50"
+                />
               </div>
-              <div className="flex flex-col gap-y-2">
-                <div className="font-sans text-gray-700">
-                  <div className="flex gap-x-1.5">
-                    <div className="w-1/6 font-sans font-medium text-gray-700">
-                      연락처
-                    </div>
-                    <div className="text-gray-500">|</div>
-                    <input
-                      type="text"
-                      placeholder=" 010-0000-0000"
-                      className="w-full bg-gray-50"
-                    />
-                  </div>
+              <div className="flex items-center gap-x-1.5">
+                <div className="w-1/6 font-sans font-medium text-gray-700">
+                  연락처
                 </div>
+                <div className="text-gray-500">|</div>
+                <input
+                  type="text"
+                  placeholder="  010-0000-0000"
+                  className="w-full h-8 rounded-lg bg-gray-50"
+                />
               </div>
-              <div className="flex flex-col gap-y-2">
-                <div className="font-sans text-gray-700">
-                  <div className="flex gap-x-1.5">
-                    <div className="w-1/6 font-sans font-medium text-gray-700">
-                      이메일
-                    </div>
-                    <div className="text-gray-500">|</div>
-                    <input
-                      type="text"
-                      placeholder=" example@email.com"
-                      className="w-full bg-gray-50"
-                    />
-                  </div>
+              <div className="flex items-center gap-x-1.5">
+                <div className="w-1/6 font-sans font-medium text-gray-700">
+                  이메일
                 </div>
+                <div className="text-gray-500">|</div>
+                <input
+                  type="text"
+                  placeholder="  example@email.com"
+                  className="w-full h-8 rounded-lg bg-gray-50"
+                />
               </div>
             </div>
           </div>
@@ -125,11 +115,11 @@ export default function Page() {
               <div className="rounded-full h-5 w-5 bg-cyan-500 flex items-center justify-center">
                 <span className="text-white text-sm font-semibold">2</span>
               </div>
-              <div className="font-sans font-medium text-gray-900">
+              <div className="font-sans font-semibold text-gray-900">
                 날짜와 시간을 선택해주세요
               </div>
             </div>
-            <div className="flex flex-col gap-y-4 bg-white border border-cyan-500/40 rounded-lg shadow-md px-4 py-4">
+            <div className="flex flex-col gap-y-4 bg-white border border-cyan-600/40 rounded-lg shadow-md px-4 py-4">
               <Datepicker
                 useRange={false}
                 asSingle={true}
@@ -150,11 +140,11 @@ export default function Page() {
               <div className="rounded-full h-5 w-5 bg-cyan-500 flex items-center justify-center">
                 <span className="text-white text-sm font-semibold">3</span>
               </div>
-              <div className="font-sans font-medium text-gray-900">
+              <div className="font-sans font-semibold text-gray-900">
                 원하시는 시술을 선택해주세요
               </div>
             </div>
-            <div className="flex flex-col gap-y-4 bg-white border border-cyan-500/40 rounded-lg shadow-md px-4 py-4">
+            <div className="flex flex-col gap-y-4 bg-white border border-cyan-600/40 rounded-lg shadow-md px-4 py-4">
               <label className="flex items-center gap-x-1.5 font-sans font-medium text-gray-700">
                 <input
                   type="checkbox"
@@ -211,11 +201,11 @@ export default function Page() {
               <div className="rounded-full h-5 w-5 bg-cyan-500 flex items-center justify-center">
                 <span className="text-white text-sm font-semibold">4</span>
               </div>
-              <div className="font-sans font-medium text-gray-900">
+              <div className="font-sans font-semibold text-gray-900">
                 예약전 확인해주세요
               </div>
             </div>
-            <div className="flex flex-col gap-y-4 bg-white border border-cyan-500/40 rounded-lg shadow-md px-4 py-4">
+            <div className="flex flex-col gap-y-4 bg-white border border-cyan-600/40 rounded-lg shadow-md px-4 py-4">
               <div className="font-sans text-gray-700">공지사항1</div>
               <div className="font-sans text-gray-700">공지사항2</div>
             </div>

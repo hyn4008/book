@@ -1,9 +1,10 @@
+"use client";
 import Link from "next/link";
 import Topbar from "../../components/topbar";
 import Thumbnail from "../../public/thumbnail.jpeg";
 // import Banner from "../../public/banner.jpeg";
 import Image from "next/image";
-import { Reservation, Parking, Wifi, Pet } from "../../components/icons";
+import { Reserve, Parking, Wifi, Pet } from "../../components/icons";
 import Jan1 from "./_static/2025_01_1.jpeg";
 import Jan2 from "./_static/2025_01_2.jpeg";
 import Jan3 from "./_static/2025_01_3.jpeg";
@@ -12,7 +13,7 @@ import Jan4 from "./_static/2025_01_4.jpeg";
 export default function Home() {
   return (
     <div className="flex flex-col h-screen">
-      <Topbar title={"Étoile Nail"} />
+      <Topbar title={"Étoile Nail"} elements={{ right: <Topbar.Check /> }} />
       <main className="flex flex-col">
         <section className="relative flex flex-col">
           <Image
@@ -88,7 +89,7 @@ export default function Home() {
               <div className="flex justify-between w-full pt-1.5">
                 <div className="flex flex-col items-center gap-y-1 px-2">
                   <div className="flex items-center px-3 py-3 bg-white rounded-xl">
-                    <Reservation />
+                    <Reserve />
                   </div>
                   <div className="font-sans text-gray-800 text-xs">예약</div>
                 </div>
