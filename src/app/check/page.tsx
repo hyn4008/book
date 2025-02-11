@@ -1,9 +1,37 @@
 "use client";
 import Topbar from "../../../components/topbar";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { User } from "../../../components/icons";
+import { useState } from "react";
 
 export default function Page() {
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+
+  const router = useRouter();
+
+  const handleCheck = () => {
+    if (name === "" || phone === "" || email === "") {
+      alert("정보를 모두 입력해주세요.");
+      return;
+    }
+
+    try {
+      // GET
+      // 입력한 예약자 정보에 해당하는 예약 내역이 있는지 확인
+
+      // if Success and,
+      // if Data exist then,
+      router.push("/show");
+
+      // else Data not exist then,
+      // alert("예약 내역이 없습니다.");
+    } catch (error) {
+      alert("예약 내역을 찾을 수 없습니다. 입력하신 정보를 다시 확인해주세요.");
+    }
+  };
+
   return (
     <>
       <Topbar title={"Étoile Nail"} elements={{ left: <Topbar.Back /> }} />
@@ -24,6 +52,7 @@ export default function Page() {
                 <input
                   type="text"
                   placeholder="  이름을 입력해주세요"
+                  onChange={(e) => setName(e.target.value)}
                   className="w-full h-8 rounded-lg bg-gray-50"
                 />
               </div>
@@ -37,6 +66,7 @@ export default function Page() {
                   <input
                     type="text"
                     placeholder="  010-0000-0000"
+                    onChange={(e) => setPhone(e.target.value)}
                     className="w-full h-8 rounded-lg bg-gray-50"
                   />
                 </div>
@@ -51,18 +81,19 @@ export default function Page() {
                   <input
                     type="text"
                     placeholder="  example@email.com"
+                    onChange={(e) => setEmail(e.target.value)}
                     className="w-full h-8 rounded-lg bg-gray-50"
                   />
                 </div>
               </div>
             </div>
           </div>
-          <Link
-            href="/show"
+          <div
+            onClick={handleCheck}
             className="flex w-full items-center justify-center rounded-full bg-cyan-500/90 font-sans font-medium text-white mt-2 px-4 py-2"
           >
             예약내역 조회
-          </Link>
+          </div>
         </div>
       </div>
     </>

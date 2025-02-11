@@ -1,27 +1,28 @@
 "use client";
-import Link from "next/link";
 import Topbar from "../../../components/topbar";
-import * as I from "../../../components/icons";
+import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Datepicker from "react-tailwindcss-datepicker";
 
 export default function Page() {
-  const [isOpen, setIsOpen] = useState(false);
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
   const [date, setDate] = useState(new Date());
-  const [time, setTime] = useState("10:00");
+  const [option, setOption] = useState([]);
+  const [request, setRequest] = useState("");
+
+  const router = useRouter();
+
   const [disabledDates, setDisabledDates] = useState([]);
-  const [menu, setMenu] = useState({
-    option: [] as number[],
-    request: "",
-  });
 
   const getAllTuesdays = (startDate, endDate) => {
-    const dates = [];
+    const tuesdays = [];
     const currentDate = new Date(startDate);
 
     while (currentDate <= endDate) {
       if (currentDate.getDay() === 2) {
-        dates.push({
+        tuesdays.push({
           startDate: new Date(currentDate),
           endDate: new Date(currentDate),
         });
@@ -29,7 +30,7 @@ export default function Page() {
       currentDate.setDate(currentDate.getDate() + 1);
     }
 
-    return dates;
+    return tuesdays;
   };
 
   useEffect(() => {
@@ -43,22 +44,40 @@ export default function Page() {
   }, []);
 
   const handleOptionChange = (value: number) => {
-    setMenu((prev) => ({
-      ...prev,
-      option: prev.option.includes(value)
-        ? prev.option.filter((item) => item !== value)
-        : [...prev.option, value],
-    }));
+    setOption((prev) => {
+      if (prev.includes(value)) {
+        return prev.filter((v) => v !== value);
+      } else {
+        return [...prev, value];
+      }
+    });
   };
 
-  const handelRequestChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setMenu((prev) => ({
-      ...prev,
-      request: e.target.value,
-    }));
-  };
+  const handleReservation = () => {
+    if (!name || !phone || !email) {
+      alert("예약자 정보를 입력해주세요");
+      return;
+    }
+    if (!date) {
+      alert("날짜를 선택해주세요");
+      return;
+    }
+    if (!option.length) {
+      alert("시술을 선택해주세요");
+      return;
+    }
+    console.log(name, phone, email, date, option, request);
 
-  console.log(menu);
+    try {
+      // POST
+
+      // if Success, then
+      alert("예약이 완료되었습니다.");
+      router.push("/show");
+    } catch (error) {
+      alert("예약에 실패했습니다. 다시 시해세요.");
+    }
+  };
 
   return (
     <div className="flex flex-col h-screen">
@@ -83,6 +102,7 @@ export default function Page() {
                 <input
                   type="text"
                   placeholder="  이름을 입력해주세요"
+                  onChange={(e) => setName(e.target.value)}
                   className="w-full h-8 rounded-lg bg-gray-50"
                 />
               </div>
@@ -94,6 +114,7 @@ export default function Page() {
                 <input
                   type="text"
                   placeholder="  010-0000-0000"
+                  onChange={(e) => setPhone(e.target.value)}
                   className="w-full h-8 rounded-lg bg-gray-50"
                 />
               </div>
@@ -104,6 +125,7 @@ export default function Page() {
                 <div className="text-gray-500">|</div>
                 <input
                   type="text"
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="  example@email.com"
                   className="w-full h-8 rounded-lg bg-gray-50"
                 />
@@ -190,7 +212,7 @@ export default function Page() {
                   요청사항
                 </div>
                 <textarea
-                  onChange={handelRequestChange}
+                  onChange={(e) => setRequest(e.target.value)}
                   className="flex rounded-lg border border-gray-200 px-2 py-1"
                 />
               </div>
@@ -212,12 +234,12 @@ export default function Page() {
           </div>
         </div>
         <div className="flex w-full mb-8">
-          <Link
-            href="/show"
+          <div
+            onClick={handleReservation}
             className="flex w-full items-center justify-center rounded-full bg-cyan-500/90 font-sans font-medium text-white px-4 py-2"
           >
             예약 완료
-          </Link>
+          </div>
         </div>
       </main>
     </div>
