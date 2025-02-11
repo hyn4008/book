@@ -1,6 +1,6 @@
 "use client";
 import Topbar from "../../../components/topbar";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import Datepicker from "react-tailwindcss-datepicker";
 
@@ -11,10 +11,13 @@ export default function Page() {
   const [date, setDate] = useState(new Date());
   const [option, setOption] = useState([]);
   const [request, setRequest] = useState("");
+  const [disabledDates, setDisabledDates] = useState([]);
 
+  const params = useSearchParams();
+  const id = params.get("id");
   const router = useRouter();
 
-  const [disabledDates, setDisabledDates] = useState([]);
+  // id 있을 때, 예약 정보 불러와서 state에 저장
 
   const getAllTuesdays = (startDate, endDate) => {
     const tuesdays = [];

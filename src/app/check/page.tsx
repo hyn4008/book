@@ -51,9 +51,9 @@ export default function Page() {
                 </div>
                 <input
                   type="text"
-                  placeholder="  이름을 입력해주세요"
+                  placeholder="이름을 입력해주세요"
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full h-8 rounded-lg bg-gray-50"
+                  className="w-full h-8 rounded-lg bg-gray-50 px-2 py-1"
                 />
               </div>
             </div>
@@ -65,9 +65,9 @@ export default function Page() {
                   </div>
                   <input
                     type="text"
-                    placeholder="  010-0000-0000"
+                    placeholder="010-0000-0000"
                     onChange={(e) => setPhone(e.target.value)}
-                    className="w-full h-8 rounded-lg bg-gray-50"
+                    className="w-full h-8 rounded-lg bg-gray-50 px-2 py-1"
                   />
                 </div>
               </div>
@@ -80,9 +80,9 @@ export default function Page() {
                   </div>
                   <input
                     type="text"
-                    placeholder="  example@email.com"
+                    placeholder="example@email.com"
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full h-8 rounded-lg bg-gray-50"
+                    className="w-full h-8 rounded-lg bg-gray-50 px-2 py-1"
                   />
                 </div>
               </div>
