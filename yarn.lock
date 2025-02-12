@@ -3730,6 +3730,11 @@ react-tailwindcss-datepicker@^2.0.0:
   resolved "https://registry.yarnpkg.com/react-tailwindcss-datepicker/-/react-tailwindcss-datepicker-2.0.0.tgz#779eca814aa832214cd9f09cd7bcb3bd9ddb02ae"
   integrity sha512-HADddzZjeOIMxkKkueAyQmiAExLXYcwgPG0Qv1oP9cjCx4/jrhbbOAbazgjJmxfhGxUw7e0Goqs+DY3htKlhAA==
 
+react-tailwindcss-select@^1.8.5:
+  version "1.8.5"
+  resolved "https://registry.yarnpkg.com/react-tailwindcss-select/-/react-tailwindcss-select-1.8.5.tgz#adf752c7e54889c38fd76bd1aa5cf8cf6d2b9788"
+  integrity sha512-x29IrLiqBT5FnkC9oFQReOr05tEOZHtDtZdha84nlSWcj3qD67yonKFHXIf69yc8ElFlKUxCEv0zCllN8jHBFA==
+
 react-time-picker@^7.0.0:
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/react-time-picker/-/react-time-picker-7.0.0.tgz#3f9d80d2de8a8ffc57c41dd71095477f6a7ffc03"

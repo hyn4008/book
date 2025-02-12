@@ -3,12 +3,14 @@ import Topbar from "../../../components/topbar";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import Datepicker from "react-tailwindcss-datepicker";
+import Select from "react-tailwindcss-select";
 
 export default function Page() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [date, setDate] = useState(new Date());
+  const [time, setTime] = useState("");
   const [option, setOption] = useState([]);
   const [request, setRequest] = useState("");
   const [disabledDates, setDisabledDates] = useState([]);
@@ -16,6 +18,19 @@ export default function Page() {
   const params = useSearchParams();
   const id = params.get("id");
   const router = useRouter();
+
+  const times = [
+    { value: "10:00", label: "10:00" },
+    { value: "11:00", label: "11:00" },
+    { value: "12:00", label: "12:00" },
+    { value: "13:00", label: "13:00" },
+    { value: "14:00", label: "14:00" },
+    { value: "15:00", label: "15:00" },
+    { value: "16:00", label: "16:00" },
+    { value: "17:00", label: "17:00" },
+    { value: "18:00", label: "18:00" },
+    { value: "19:00", label: "19:00" },
+  ];
 
   // id 있을 때, 예약 정보 불러와서 state에 저장
 
@@ -104,9 +119,10 @@ export default function Page() {
                 <div className="text-gray-500">|</div>
                 <input
                   type="text"
-                  placeholder="  이름을 입력해주세요"
+                  placeholder="이름을 입력해주세요"
+                  value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full h-8 rounded-lg bg-gray-50"
+                  className="w-full h-8 rounded-lg bg-gray-50 px-2 py-1"
                 />
               </div>
               <div className="flex items-center gap-x-1.5">
@@ -116,9 +132,10 @@ export default function Page() {
                 <div className="text-gray-500">|</div>
                 <input
                   type="text"
-                  placeholder="  010-0000-0000"
+                  placeholder="010-0000-0000"
+                  value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="w-full h-8 rounded-lg bg-gray-50"
+                  className="w-full h-8 rounded-lg bg-gray-50 px-2 py-1"
                 />
               </div>
               <div className="flex items-center gap-x-1.5">
@@ -129,8 +146,9 @@ export default function Page() {
                 <input
                   type="text"
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="  example@email.com"
-                  className="w-full h-8 rounded-lg bg-gray-50"
+                  value={email}
+                  placeholder="example@email.com"
+                  className="w-full h-8 rounded-lg bg-gray-50 px-2 py-1"
                 />
               </div>
             </div>
@@ -148,16 +166,31 @@ export default function Page() {
               <Datepicker
                 useRange={false}
                 asSingle={true}
+                placeholder="Select Date"
                 value={date}
                 onChange={(date) => setDate(date)}
                 minDate={new Date()}
                 disabledDates={disabledDates}
                 primaryColor={"cyan"}
-                // toggleClassName={
-                //   "absolute right-0 h-full px-3 rounded-r-lg text-cyan-500"
-                // }
+                inputClassName={
+                  "w-full rounded-lg bg-gray-50 text-gray-900 px-4 py-2"
+                }
+                toggleClassName={
+                  "absolute right-0 top-1.5 h-[28px] px-3 rounded-r-lg border-l border-gray-300 text-gray-400"
+                }
               />
-              <div>Timepicker</div>
+              <Select
+                placeholder="Select Time"
+                value={time}
+                onChange={(e) => setTime(e)}
+                options={times}
+                isSearchable={false}
+                primaryColor={"cyan"}
+                classNames={{
+                  menuButton: () =>
+                    "flex shrink-0 w-full rounded-lg bg-gray-50 text-gray-400 px-1.5 py-0.5",
+                }}
+              />
             </div>
           </div>
           <div className="flex flex-col gap-y-2">
@@ -173,6 +206,7 @@ export default function Page() {
               <label className="flex items-center gap-x-1.5 font-sans font-medium text-gray-700">
                 <input
                   type="checkbox"
+                  checked={option.includes(1)}
                   onChange={() => handleOptionChange(1)}
                   className="h-4 w-4 checked:bg-cyan-500"
                 />
@@ -230,9 +264,18 @@ export default function Page() {
                 예약전 확인해주세요
               </div>
             </div>
-            <div className="flex flex-col gap-y-4 bg-white border border-cyan-600/40 rounded-lg shadow-md px-4 py-4">
-              <div className="font-sans text-gray-700">공지사항1</div>
-              <div className="font-sans text-gray-700">공지사항2</div>
+            <div className="flex flex-col bg-white border border-cyan-600/40 rounded-lg shadow-md px-4 py-4">
+              <div className="font-sans text-sm font-semibold text-gray-700">
+                예약 취소는 7일 전, 변경은 3일 전까지 가능합니다.
+              </div>
+              <div className="flex w-full h-0.5 bg-gray-100 my-2" />
+              <div className="font-sans text-sm font-semibold text-gray-700">
+                변경은 1회만 가능하므로 신중하게 선택해주세요.
+              </div>
+              <div className="flex w-full h-0.5 bg-gray-100 my-2" />
+              <div className="font-sans text-sm font-semibold text-gray-700">
+                시술 시간은 예상 소요 시간보다 길어질 수 있습니다.
+              </div>
             </div>
           </div>
         </div>
