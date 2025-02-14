@@ -4,19 +4,20 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import Datepicker from "react-tailwindcss-datepicker";
 import Select from "react-tailwindcss-select";
+import supabase from "@root/supabase.config";
 
 export default function Page() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
-  const [date, setDate] = useState(new Date());
-  const [time, setTime] = useState("");
+  const [date, setDate] = useState(null);
+  const [time, setTime] = useState(null);
   const [option, setOption] = useState([]);
   const [request, setRequest] = useState("");
   const [disabledDates, setDisabledDates] = useState([]);
 
   const params = useSearchParams();
-  const id = params.get("id");
+  const id = params.get("id"); // 예약 변경 시, id로 예약 정보 불러오기
   const router = useRouter();
 
   const times = [
@@ -32,8 +33,7 @@ export default function Page() {
     { value: "19:00", label: "19:00" },
   ];
 
-  // id 있을 때, 예약 정보 불러와서 state에 저장
-
+  // startDate부터 endDate까지의 모든 화요일을 반환
   const getAllTuesdays = (startDate, endDate) => {
     const tuesdays = [];
     const currentDate = new Date(startDate);
@@ -51,6 +51,7 @@ export default function Page() {
     return tuesdays;
   };
 
+  // 화요일은 예약 불가능하도록 설정
   useEffect(() => {
     const startDate = new Date();
     const endDate = new Date(
@@ -61,6 +62,22 @@ export default function Page() {
     setDisabledDates(getAllTuesdays(startDate, endDate));
   }, []);
 
+  // Date 객체에서 시간 정보를 제외하고 날짜만 반환
+  const getDate = (date) => {
+    return new Date(
+      date.startDate.getFullYear(),
+      date.startDate.getMonth(),
+      date.startDate.getDate()
+    );
+  };
+
+  // "HH:mm" 형식의 시간을 Date 객체로 변환
+  const getTime = (time) => {
+    const [hour, minute] = time.split(":");
+    return new Date(`1999/12/31/${hour}:${minute}:0`); // 1999년 12월 31일 HH:mm:00
+  };
+
+  // 시술 선택
   const handleOptionChange = (value: number) => {
     setOption((prev) => {
       if (prev.includes(value)) {
@@ -71,8 +88,8 @@ export default function Page() {
     });
   };
 
-  const handleReservation = () => {
-    if (!name || !phone || !email) {
+  const handleReservation = async () => {
+    if (!name || !phone) {
       alert("예약자 정보를 입력해주세요");
       return;
     }
@@ -80,27 +97,40 @@ export default function Page() {
       alert("날짜를 선택해주세요");
       return;
     }
+    if (!time) {
+      alert("시간을 선택해주세요");
+      return;
+    }
     if (!option.length) {
       alert("시술을 선택해주세요");
       return;
     }
-    console.log(name, phone, email, date, option, request);
 
     try {
-      // POST
-
-      // if Success, then
-      alert("예약이 완료되었습니다.");
-      router.push("/show");
+      const { error } = await supabase.from("reservation").insert({
+        name: name,
+        phone: phone,
+        email: email,
+        date: getDate(date),
+        time: getTime(time),
+        option: option,
+        request: request,
+      });
+      if (error) {
+        alert("예약에 실패했습니다. 다시 시도해주세요.");
+      } else {
+        alert("예약이 완료되었습니다.");
+        router.push("/show");
+      }
     } catch (error) {
-      alert("예약에 실패했습니다. 다시 시해세요.");
+      alert("예약에 실패했습니다. 다시 시도해주세요.");
     }
   };
 
   return (
     <div className="flex flex-col h-screen">
       <Topbar title={"Étoile Nail"} elements={{ left: <Topbar.Back /> }} />
-      <main className="flex flex-col gap-y-8 pt-8 px-4 bg-gray-50">
+      <main className="flex flex-col gap-y-8 pt-8 px-4 bg-gray-50 pb-20">
         <div className="flex flex-col gap-y-8">
           <div className="flex flex-col gap-y-2">
             <div className="flex items-center gap-x-1.5">
@@ -182,7 +212,7 @@ export default function Page() {
               <Select
                 placeholder="Select Time"
                 value={time}
-                onChange={(e) => setTime(e)}
+                onChange={(e) => setTime(e.value)}
                 options={times}
                 isSearchable={false}
                 primaryColor={"cyan"}
@@ -206,8 +236,7 @@ export default function Page() {
               <label className="flex items-center gap-x-1.5 font-sans font-medium text-gray-700">
                 <input
                   type="checkbox"
-                  checked={option.includes(1)}
-                  onChange={() => handleOptionChange(1)}
+                  onChange={() => handleOptionChange("젤제거")}
                   className="h-4 w-4 checked:bg-cyan-500"
                 />
                 젤 제거
@@ -215,7 +244,7 @@ export default function Page() {
               <label className="flex items-center gap-x-1.5 font-sans font-medium text-gray-700">
                 <input
                   type="checkbox"
-                  onChange={() => handleOptionChange(2)}
+                  onChange={() => handleOptionChange("원컬러")}
                   className="size-4 checked:bg-cyan-500"
                 />
                 원컬러
@@ -223,7 +252,7 @@ export default function Page() {
               <label className="flex items-center gap-x-1.5 font-sans font-medium text-gray-700">
                 <input
                   type="checkbox"
-                  onChange={() => handleOptionChange(3)}
+                  onChange={() => handleOptionChange("간단아트")}
                   className="size-4 checked:bg-cyan-500"
                 />
                 간단아트
@@ -231,7 +260,7 @@ export default function Page() {
               <label className="flex items-center gap-x-1.5 font-sans font-medium text-gray-700">
                 <input
                   type="checkbox"
-                  onChange={() => handleOptionChange(4)}
+                  onChange={() => handleOptionChange("풀아트")}
                   className="size-4 checked:bg-cyan-500"
                 />
                 풀아트
@@ -239,10 +268,10 @@ export default function Page() {
               <label className="flex items-center gap-x-1.5 font-sans font-medium text-gray-700">
                 <input
                   type="checkbox"
-                  onChange={() => handleOptionChange(5)}
+                  onChange={() => handleOptionChange("케어")}
                   className="size-4 checked:bg-cyan-500"
                 />
-                기본케어
+                케어
               </label>
               <div className="flex flex-col gap-y-1">
                 <div className="font-sans font-medium text-gray-700">

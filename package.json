@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.48.1",
     "@svgr/webpack": "^8.1.0",
     "@syncfusion/ej2-react-calendars": "^28.2.3",
     "dayjs": "^1.11.13",
