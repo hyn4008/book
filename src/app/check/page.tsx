@@ -3,32 +3,34 @@ import Topbar from "../../../components/topbar";
 import { useRouter } from "next/navigation";
 import { User } from "../../../components/icons";
 import { useState } from "react";
+import supabase from "@root/supabase.config";
 
 export default function Page() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
 
   const router = useRouter();
 
-  const handleCheck = () => {
-    if (name === "" || phone === "" || email === "") {
+  const handleCheck = async () => {
+    if (name === "" || phone === "") {
       alert("정보를 모두 입력해주세요.");
       return;
     }
 
-    try {
-      // GET
-      // 입력한 예약자 정보에 해당하는 예약 내역이 있는지 확인
-
-      // if Success and,
-      // if Data exist then,
-      router.push("/show");
-
-      // else Data not exist then,
-      // alert("예약 내역이 없습니다.");
-    } catch (error) {
-      alert("예약 내역을 찾을 수 없습니다. 입력하신 정보를 다시 확인해주세요.");
+    const { data, error } = await supabase
+      .from("reservation")
+      .select("id")
+      .eq("name", name)
+      .eq("phone", phone);
+    if (error) {
+      alert("예약 내역을 찾을 수 없습니다. 정보를 다시 입력해주세요.");
+    } else if (data.length === 0) {
+      alert(
+        "입력하신 정보와 일치하는 예약 내역이 없습니다. 다시 확인해주세요."
+      );
+    } else {
+      const ids = data.map((item) => item.id).join(",");
+      router.push(`/show?ids=${ids}`);
     }
   };
 
@@ -65,23 +67,9 @@ export default function Page() {
                   </div>
                   <input
                     type="text"
-                    placeholder="010-0000-0000"
+                    placeholder="'-'을 제외한 숫자만 입력해주세요"
                     onChange={(e) => setPhone(e.target.value)}
-                    className="w-full h-8 rounded-lg bg-gray-50 px-2 py-1"
-                  />
-                </div>
-              </div>
-            </div>
-            <div className="flex flex-col gap-y-2">
-              <div className="font-sans text-gray-700">
-                <div className="flex items-center gap-x-1.5">
-                  <div className="w-1/5 font-sans font-semibold text-gray-700">
-                    이메일
-                  </div>
-                  <input
-                    type="text"
-                    placeholder="example@email.com"
-                    onChange={(e) => setEmail(e.target.value)}
+                    maxLength={11}
                     className="w-full h-8 rounded-lg bg-gray-50 px-2 py-1"
                   />
                 </div>

@@ -6,10 +6,20 @@ import Datepicker from "react-tailwindcss-datepicker";
 import Select from "react-tailwindcss-select";
 import supabase from "@root/supabase.config";
 
+// type Reservation = {
+//   name: string;
+//   phone: string;
+//   password: string;
+//   date: Date;
+//   time: Date;
+//   option: string[];
+//   request: string;
+// };
+
 export default function Page() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [date, setDate] = useState(null);
   const [time, setTime] = useState(null);
   const [option, setOption] = useState([]);
@@ -17,7 +27,36 @@ export default function Page() {
   const [disabledDates, setDisabledDates] = useState([]);
 
   const params = useSearchParams();
-  const id = params.get("id"); // 예약 변경 시, id로 예약 정보 불러오기
+  const id = params.get("id");
+
+  // 예약 변경 시, id로 예약 정보 불러오기
+  // TODO : 예약 날짜와 시간 불러오기는 하나, 기본값 설정이 안 됨
+  useEffect(() => {
+    const getReservation = async () => {
+      if (id) {
+        const { data, error } = await supabase
+          .from("reservation")
+          .select("name, phone, password, date, time, option, request")
+          .eq("id", id)
+          .single();
+
+        if (error) {
+          alert("예약 정보를 불러오는 중 오류가 발생했습니다.");
+        } else {
+          setName(data.name);
+          setPhone(data.phone);
+          setPassword(data.password);
+          setDate(new Date(data.date));
+          setTime(new Date(data.time));
+          setOption(data.option);
+          setRequest(data.request);
+        }
+      }
+    };
+
+    getReservation();
+  }, [id]);
+
   const router = useRouter();
 
   const times = [
@@ -73,7 +112,7 @@ export default function Page() {
 
   // "HH:mm" 형식의 시간을 Date 객체로 변환
   const getTime = (time) => {
-    const [hour, minute] = time.split(":");
+    const [hour, minute] = time.value.split(":");
     return new Date(`1999/12/31/${hour}:${minute}:0`); // 1999년 12월 31일 HH:mm:00
   };
 
@@ -89,8 +128,8 @@ export default function Page() {
   };
 
   const handleReservation = async () => {
-    if (!name || !phone) {
-      alert("예약자 정보를 입력해주세요");
+    if (!name || !phone || !password) {
+      alert("예약자 정보를 모두 입력해주세요");
       return;
     }
     if (!date) {
@@ -106,24 +145,44 @@ export default function Page() {
       return;
     }
 
-    try {
+    if (id) {
+      const { error } = await supabase
+        .from("reservation")
+        .update({
+          name: name,
+          phone: phone,
+          password: password,
+          date: getDate(date),
+          time: getTime(time),
+          option: option,
+          request: request,
+          change_at: new Date(),
+        })
+        .eq("id", id);
+
+      if (error) {
+        alert("예약 변경에 실패했습니다. 다시 시도해주세요.");
+      } else {
+        alert("예약이 변경되었습니다.");
+        router.push("/");
+      }
+    } else {
       const { error } = await supabase.from("reservation").insert({
         name: name,
         phone: phone,
-        email: email,
+        password: password,
         date: getDate(date),
         time: getTime(time),
         option: option,
         request: request,
       });
+
       if (error) {
         alert("예약에 실패했습니다. 다시 시도해주세요.");
       } else {
         alert("예약이 완료되었습니다.");
-        router.push("/show");
+        router.push("/");
       }
-    } catch (error) {
-      alert("예약에 실패했습니다. 다시 시도해주세요.");
     }
   };
 
@@ -162,24 +221,31 @@ export default function Page() {
                 <div className="text-gray-500">|</div>
                 <input
                   type="text"
-                  placeholder="010-0000-0000"
+                  placeholder="'-'를 제외한 숫자만 입력해주세요"
                   value={phone}
+                  maxLength={11}
                   onChange={(e) => setPhone(e.target.value)}
                   className="w-full h-8 rounded-lg bg-gray-50 px-2 py-1"
                 />
               </div>
-              <div className="flex items-center gap-x-1.5">
-                <div className="w-1/6 font-sans font-medium text-gray-700">
-                  이메일
+              <div className="flex gap-x-1.5">
+                <div className="w-1/6 pt-1 font-sans font-medium text-gray-700">
+                  비밀번호
                 </div>
-                <div className="text-gray-500">|</div>
-                <input
-                  type="text"
-                  onChange={(e) => setEmail(e.target.value)}
-                  value={email}
-                  placeholder="example@email.com"
-                  className="w-full h-8 rounded-lg bg-gray-50 px-2 py-1"
-                />
+                <div className="pt-1 text-gray-500">|</div>
+                <div className="flex flex-col w-full gap-y-1">
+                  <input
+                    type="password"
+                    onChange={(e) => setPassword(e.target.value)}
+                    value={password}
+                    maxLength={4}
+                    placeholder="숫자 4자리를 입력해주세요"
+                    className="w-full h-8 rounded-lg bg-gray-50 px-2 py-1"
+                  />
+                  <div className="ml-1 font-sans text-xs text-gray-500">
+                    예약 내역을 조회하고 변경하기 위한 비밀번호입니다
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -212,7 +278,7 @@ export default function Page() {
               <Select
                 placeholder="Select Time"
                 value={time}
-                onChange={(e) => setTime(e.value)}
+                onChange={(e) => setTime(e)}
                 options={times}
                 isSearchable={false}
                 primaryColor={"cyan"}
@@ -236,6 +302,7 @@ export default function Page() {
               <label className="flex items-center gap-x-1.5 font-sans font-medium text-gray-700">
                 <input
                   type="checkbox"
+                  checked={option.includes("젤제거")}
                   onChange={() => handleOptionChange("젤제거")}
                   className="h-4 w-4 checked:bg-cyan-500"
                 />
@@ -244,6 +311,7 @@ export default function Page() {
               <label className="flex items-center gap-x-1.5 font-sans font-medium text-gray-700">
                 <input
                   type="checkbox"
+                  checked={option.includes("원컬러")}
                   onChange={() => handleOptionChange("원컬러")}
                   className="size-4 checked:bg-cyan-500"
                 />
@@ -252,6 +320,7 @@ export default function Page() {
               <label className="flex items-center gap-x-1.5 font-sans font-medium text-gray-700">
                 <input
                   type="checkbox"
+                  checked={option.includes("간단아트")}
                   onChange={() => handleOptionChange("간단아트")}
                   className="size-4 checked:bg-cyan-500"
                 />
@@ -260,6 +329,7 @@ export default function Page() {
               <label className="flex items-center gap-x-1.5 font-sans font-medium text-gray-700">
                 <input
                   type="checkbox"
+                  checked={option.includes("풀아트")}
                   onChange={() => handleOptionChange("풀아트")}
                   className="size-4 checked:bg-cyan-500"
                 />
@@ -268,6 +338,7 @@ export default function Page() {
               <label className="flex items-center gap-x-1.5 font-sans font-medium text-gray-700">
                 <input
                   type="checkbox"
+                  checked={option.includes("케어")}
                   onChange={() => handleOptionChange("케어")}
                   className="size-4 checked:bg-cyan-500"
                 />
@@ -278,6 +349,7 @@ export default function Page() {
                   요청사항
                 </div>
                 <textarea
+                  value={request}
                   onChange={(e) => setRequest(e.target.value)}
                   className="flex rounded-lg border border-gray-200 px-2 py-1"
                 />

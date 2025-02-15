@@ -2,50 +2,59 @@
 import Topbar from "../../../components/topbar";
 import Link from "next/link";
 import { Check } from "../../../components/icons";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useEffect } from "react";
+import supabase from "@root/supabase.config";
 
 type Reservation = {
   id: number;
-  datetime: Date;
+  name: string;
+  date: Date;
+  time: Date;
   option: string[];
   request: string;
-  change_count: number;
-  cancel_datetime: Date | null;
-  status: "예정" | "완료" | "취소";
+  created_at: Date;
+  change_at: Date;
+  cancel_at: Date;
+  password: string;
 };
 
 export default function Page() {
-  const reservations: Reservation[] = [
-    {
-      id: 1357,
-      datetime: new Date("2025-02-18T16:00"),
-      option: ["손젤"],
-      request: "예쁘게 해주세용",
-      change_count: 0,
-      cancel_datetime: null,
-      status: "예정",
-    },
-    {
-      id: 8642,
-      datetime: new Date("2025-02-15T09:13"),
-      option: ["젤제거", "기본아트"],
-      request: "",
-      change_count: 1,
-      cancel_datetime: null,
-      status: "예정",
-    },
-    {
-      id: 7417,
-      datetime: new Date("2025-01-24T23:49"),
-      option: ["케어"],
-      request: "남자 손톱 정리 부탁드립니다.",
-      change_count: 0,
-      cancel_datetime: new Date("2025-01-31T12:00"),
-      status: "취소",
-    },
-  ];
-
   const router = useRouter();
+  const params = useSearchParams();
+  const ids = params.get("ids").split(",");
+  const [reservations, setReservations] = useState<Reservation[]>([]);
+
+  // TODO : 브라우저가 멈추지 않고 요청을 보냄
+  useEffect(() => {
+    const getReservations = async () => {
+      const { data, error } = await supabase
+        .from("reservation")
+        .select(
+          "id, name, date, time, option, request, created_at, change_at, cancel_at, password"
+        )
+        .in("id", ids);
+      if (error) {
+        alert(
+          "예약 내역을 불러오는 중 오류가 발생했습니다. 다시 시도해주세요."
+        );
+        return;
+      }
+      setReservations(data);
+    };
+
+    getReservations();
+  }, [ids]);
+
+  const getDatetime = (selectedDate: Date, selectedTime: Date) => {
+    const date = new Date(selectedDate);
+    const time = new Date(selectedTime);
+    date.setHours(time.getHours());
+    date.setMinutes(time.getMinutes());
+    date.setSeconds(0);
+
+    return date;
+  };
 
   const getRemainingDays = (date: Date) => {
     const today = new Date();
@@ -53,14 +62,18 @@ export default function Page() {
     return Math.ceil(diff / (1000 * 60 * 60 * 24)) + 1;
   };
 
-  const handleCancel = () => {
+  const handleCancel = async (id: number) => {
     if (confirm("예약을 취소하시겠습니까?")) {
-      try {
-        // DELETE
+      const { error } = await supabase
+        .from("reservation")
+        .update({ cancel_at: new Date() })
+        .eq("id", id);
+
+      if (error) {
+        alert("예약 취소에 실패했습니다. 다시 시도해주세요.");
+      } else {
         alert("예약이 취소되었습니다.");
         router.push("/");
-      } catch (error) {
-        alert("예약 취소에 실패했습니다. 다시 시도해주세요.");
       }
     }
   };
@@ -81,22 +94,22 @@ export default function Page() {
             key={idx}
             className="flex flex-col gap-y-5 bg-white rounded-xl shadow-md px-5 py-5"
           >
-            {reservation.status === "예정" ? (
+            {reservation.cancel_at ? (
               <div className="flex gap-x-1.5">
-                <div className="flex items-center h-fit px-2 py-1 rounded-xl bg-cyan-500/90 font-sans text-sm font-base text-white">
-                  {reservation.status}
+                <div className="flex items-center h-fit px-2 py-1 rounded-xl bg-cyan-500/50 font-sans text-sm font-base text-white">
+                  취소
                 </div>
               </div>
-            ) : reservation.status === "완료" ? (
+            ) : getDatetime(reservation.date, reservation.time) > new Date() ? (
               <div className="flex gap-x-1.5">
-                <div className="flex items-center h-fit px-2 py-1 rounded-xl bg-white border border-1 border-cyan-600/90 font-sans text-sm font-medium text-cyan-600/90">
-                  완료
+                <div className="flex items-center h-fit px-2 py-1 rounded-xl bg-cyan-500/90 font-sans text-sm font-base text-white">
+                  예정
                 </div>
               </div>
             ) : (
               <div className="flex gap-x-1.5">
-                <div className="flex items-center h-fit px-2 py-1 rounded-xl bg-cyan-500/50 font-sans text-sm font-base text-white">
-                  취소
+                <div className="flex items-center h-fit px-2 py-1 rounded-xl bg-white border border-1 border-cyan-600/90 font-sans text-sm font-medium text-cyan-600/90">
+                  완료
                 </div>
               </div>
             )}
@@ -116,7 +129,10 @@ export default function Page() {
                   &nbsp;예약 일시
                 </div>
                 <div className="w-full font-sans font-medium text-gray-900">
-                  {reservation.datetime.toLocaleString()}
+                  {getDatetime(
+                    reservation.date,
+                    reservation.time
+                  ).toLocaleString()}
                 </div>
               </div>
               <div className="flex w-full border border-cyan-600/20" />
@@ -155,15 +171,13 @@ export default function Page() {
                 </div>
                 <div
                   className={`w-full font-sans font-medium ${
-                    reservation.change_count > 0
-                      ? "text-red-500"
-                      : "text-gray-900"
+                    reservation.change_at ? "text-red-500" : "text-gray-900"
                   }`}
                 >
-                  {reservation.change_count} / 1
+                  {reservation.change_at ? "1" : "0"} / 1
                 </div>
               </div>
-              {reservation.status === "취소" && (
+              {reservation.cancel_at && (
                 <>
                   <div className="flex w-full border border-cyan-600/20" />
                   <div className="flex items-center gap-x-1.5">
@@ -171,25 +185,32 @@ export default function Page() {
                       &nbsp;취소 일시
                     </div>
                     <div className="w-full font-sans font-medium text-gray-900">
-                      {reservation.cancel_datetime?.toLocaleDateString()}
+                      {new Date(reservation.cancel_at).toLocaleDateString()}
                     </div>
                   </div>
                 </>
               )}
             </div>
 
-            {reservation.status === "예정" ? (
+            {reservation.cancel_at ? null : getDatetime(
+                reservation.date,
+                reservation.time
+              ) > new Date() ? (
               <div className="flex gap-x-2 w-full">
-                {getRemainingDays(reservation.datetime) > 7 && (
+                {getRemainingDays(
+                  getDatetime(reservation.date, reservation.time)
+                ) > 7 && (
                   <div
-                    onClick={handleCancel}
+                    onClick={() => handleCancel(reservation.id)}
                     className="flex w-full items-center justify-center rounded-xl bg-white border border-1 border-cyan-600/90 font-sans font-medium text-cyan-600/90 mt-2 px-4 py-2"
                   >
                     취소하기
                   </div>
                 )}
-                {getRemainingDays(reservation.datetime) > 3 &&
-                  reservation.change_count < 1 && (
+                {getRemainingDays(
+                  getDatetime(reservation.date, reservation.time)
+                ) > 3 &&
+                  !reservation.change_at && (
                     <div
                       onClick={() =>
                         router.push(`/reserve?id=${reservation.id}`)
@@ -199,22 +220,26 @@ export default function Page() {
                       변경하기
                     </div>
                   )}
-                {getRemainingDays(reservation.datetime) <= 3 ||
-                  (getRemainingDays(reservation.datetime) <= 7 &&
-                    reservation.change_count > 0 && (
+                {getRemainingDays(
+                  getDatetime(reservation.date, reservation.time)
+                ) <= 3 ||
+                  (getRemainingDays(
+                    getDatetime(reservation.date, reservation.time)
+                  ) <= 7 &&
+                    reservation.change_at && (
                       <div className="flex w-full items-center justify-center rounded-xl bg-cyan-500/60 font-sans font-medium text-white mt-2 px-4 py-2">
                         변경 불가
                       </div>
                     ))}
               </div>
-            ) : reservation.status === "완료" ? (
+            ) : (
               <Link
                 href="/reserve"
                 className="flex w-full items-center justify-center rounded-xl bg-white border border-1 border-cyan-600/90 font-sans font-medium text-cyan-600/90 mt-2 px-4 py-2"
               >
                 재예약 하기
               </Link>
-            ) : null}
+            )}
           </div>
         ))}
       </main>
