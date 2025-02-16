@@ -24,10 +24,12 @@ export default function Page() {
     startDate: new Date(),
     endDate: new Date(),
   });
-  const [time, setTime] = useState(new Date());
-  const [option, setOption] = useState([]);
+  const [time, setTime] = useState({ value: "10:00", label: "10:00" });
+  const [option, setOption] = useState<string[]>([]);
   const [request, setRequest] = useState("");
-  const [disabledDates, setDisabledDates] = useState([]);
+  const [disabledDates, setDisabledDates] = useState<
+    { startDate: Date; endDate: Date }[]
+  >([]);
 
   const params = useSearchParams();
   const id = params.get("id");
@@ -46,6 +48,12 @@ export default function Page() {
         if (error) {
           alert("예약 정보를 불러오는 중 오류가 발생했습니다.");
         } else {
+          // data.time에서 시간과 분 정보만 HH:mm 형식의 string으로 추출
+          const time = new Date(data.time).toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+
           setName(data.name);
           setPhone(data.phone);
           setPassword(data.password);
@@ -53,7 +61,7 @@ export default function Page() {
             startDate: new Date(data.date),
             endDate: new Date(data.date),
           });
-          setTime(new Date(data.time));
+          setTime({ value: time, label: time });
           setOption(data.option);
           setRequest(data.request);
         }
@@ -79,7 +87,13 @@ export default function Page() {
   ];
 
   // startDate부터 endDate까지의 모든 화요일을 반환
-  const getAllTuesdays = (startDate, endDate) => {
+  const getAllTuesdays = ({
+    startDate,
+    endDate,
+  }: {
+    startDate: Date;
+    endDate: Date;
+  }) => {
     const tuesdays = [];
     const currentDate = new Date(startDate);
 
@@ -104,11 +118,11 @@ export default function Page() {
       startDate.getMonth() + 1,
       0
     );
-    setDisabledDates(getAllTuesdays(startDate, endDate));
+    setDisabledDates(getAllTuesdays({ startDate, endDate }));
   }, []);
 
   // Date 객체에서 시간 정보를 제외하고 날짜만 반환
-  const getDate = (date) => {
+  const getDate = ({ date }: { date: { startDate: Date; endDate: Date } }) => {
     return new Date(
       date.startDate.getFullYear(),
       date.startDate.getMonth(),
@@ -117,16 +131,16 @@ export default function Page() {
   };
 
   // "HH:mm" 형식의 시간을 Date 객체로 변환
-  const getTime = (time) => {
+  const getTime = ({ time }: { time: { value: string; label: string } }) => {
     const [hour, minute] = time.value.split(":");
     return new Date(`1999/12/31/${hour}:${minute}:0`); // 1999년 12월 31일 HH:mm:00
   };
 
   // 시술 선택
-  const handleOptionChange = (value: number) => {
+  const handleOptionChange = (value: string) => {
     setOption((prev) => {
       if (prev.includes(value)) {
-        return prev.filter((v) => v !== value);
+        return prev.filter((item) => item !== value);
       } else {
         return [...prev, value];
       }
@@ -151,6 +165,7 @@ export default function Page() {
       return;
     }
 
+    // id가 있으면 예약 변경, 없으면 예약 등록
     if (id) {
       const { error } = await supabase
         .from("reservation")
@@ -158,8 +173,8 @@ export default function Page() {
           name: name,
           phone: phone,
           password: password,
-          date: getDate(date),
-          time: getTime(time),
+          date: getDate({ date }),
+          time: getTime({ time }),
           option: option,
           request: request,
           change_at: new Date(),
@@ -177,8 +192,8 @@ export default function Page() {
         name: name,
         phone: phone,
         password: password,
-        date: getDate(date),
-        time: getTime(time),
+        date: getDate({ date }),
+        time: getTime({ time }),
         option: option,
         request: request,
       });
@@ -191,6 +206,8 @@ export default function Page() {
       }
     }
   };
+
+  console.log(date, time);
 
   return (
     <div className="flex flex-col h-screen">
@@ -270,7 +287,7 @@ export default function Page() {
                 asSingle={true}
                 placeholder="Select Date"
                 value={date}
-                onChange={(date) => setDate(date)}
+                onChange={(e) => setDate(e)}
                 minDate={new Date()}
                 disabledDates={disabledDates}
                 primaryColor={"cyan"}
