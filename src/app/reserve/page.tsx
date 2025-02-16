@@ -20,8 +20,11 @@ export default function Page() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
-  const [date, setDate] = useState(null);
-  const [time, setTime] = useState(null);
+  const [date, setDate] = useState({
+    startDate: new Date(),
+    endDate: new Date(),
+  });
+  const [time, setTime] = useState(new Date());
   const [option, setOption] = useState([]);
   const [request, setRequest] = useState("");
   const [disabledDates, setDisabledDates] = useState([]);
@@ -30,7 +33,7 @@ export default function Page() {
   const id = params.get("id");
 
   // 예약 변경 시, id로 예약 정보 불러오기
-  // TODO : 예약 날짜와 시간 불러오기는 하나, 기본값 설정이 안 됨
+  // TODO : 예약 등록일 때는 null, 수정일 때는 기본값 설정
   useEffect(() => {
     const getReservation = async () => {
       if (id) {
@@ -46,7 +49,10 @@ export default function Page() {
           setName(data.name);
           setPhone(data.phone);
           setPassword(data.password);
-          setDate(new Date(data.date));
+          setDate({
+            startDate: new Date(data.date),
+            endDate: new Date(data.date),
+          });
           setTime(new Date(data.time));
           setOption(data.option);
           setRequest(data.request);
