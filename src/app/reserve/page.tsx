@@ -212,7 +212,7 @@ export default function Page() {
   return (
     <div className="flex flex-col h-screen">
       <Topbar title={"Étoile Nail"} elements={{ left: <Topbar.Back /> }} />
-      <main className="flex flex-col gap-y-8 pt-8 px-4 bg-gray-50 pb-20">
+      <main className="flex flex-col gap-y-8 pt-16 px-4 bg-gray-50 pb-20">
         <div className="flex flex-col gap-y-8">
           <div className="flex flex-col gap-y-2">
             <div className="flex items-center gap-x-1.5">

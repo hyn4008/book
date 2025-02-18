@@ -14,7 +14,7 @@ export default function Home() {
   return (
     <div className="flex flex-col h-screen">
       <Topbar title={"Étoile Nail"} elements={{ right: <Topbar.Check /> }} />
-      <main className="flex flex-col">
+      <main className="flex flex-col pt-14">
         <section className="relative flex flex-col">
           <Image
             src={Thumbnail}

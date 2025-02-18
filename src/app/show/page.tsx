@@ -24,6 +24,10 @@ export default function Page() {
   const router = useRouter();
   const params = useSearchParams();
   const [reservations, setReservations] = useState<Reservation[]>([]);
+  const [selectedId, setSelectedId] = useState(0);
+  const [action, setAction] = useState<"change" | "cancel">("change");
+  const [isOpen, setIsOpen] = useState(false);
+  const [password, setPassword] = useState("");
 
   useEffect(() => {
     const ids = params.get("ids")?.split(",");
@@ -68,18 +72,44 @@ export default function Page() {
     return Math.ceil(diff / (1000 * 60 * 60 * 24)) + 1;
   };
 
-  const handleCancel = async (id: number) => {
-    if (confirm("예약을 취소하시겠습니까?")) {
-      const { error } = await supabase
-        .from("reservation")
-        .update({ cancel_at: new Date() })
-        .eq("id", id);
+  const handleCheck = async () => {
+    if (password === "") {
+      alert("비밀번호를 입력해주세요.");
+      return;
+    }
+    if (password.length !== 4) {
+      alert("비밀번호는 4자리로 입력해주세요.");
+      return;
+    }
 
-      if (error) {
-        alert("예약 취소에 실패했습니다. 다시 시도해주세요.");
+    const { data, error } = await supabase
+      .from("reservation")
+      .select("password")
+      .eq("id", selectedId)
+      .single();
+    if (error) {
+      alert("비밀번호를 확인하는 중 오류가 발생했습니다. 다시 시도해주세요.");
+      return;
+    } else if (data.password !== password) {
+      alert("비밀번호가 일치하지 않습니다. 다시 입력해주세요.");
+      return;
+    } else {
+      if (action === "change") {
+        router.push(`/reserve?id=${selectedId}`);
       } else {
-        alert("예약이 취소되었습니다.");
-        router.push("/");
+        if (confirm("예약을 취소하시겠습니까?")) {
+          const { error } = await supabase
+            .from("reservation")
+            .update({ cancel_at: new Date() })
+            .eq("id", selectedId);
+
+          if (error) {
+            alert("예약 취소에 실패했습니다. 다시 시도해주세요.");
+          } else {
+            alert("예약이 취소되었습니다.");
+            router.push("/");
+          }
+        }
       }
     }
   };
@@ -87,7 +117,7 @@ export default function Page() {
   return (
     <div className="flex flex-col h-screen">
       <Topbar title={"Étoile Nail"} elements={{ left: <Topbar.Back /> }} />
-      <main className="flex flex-col gap-y-4 pt-8 pb-16 px-5 bg-gray-50">
+      <main className="flex flex-col gap-y-4 mt-10 pt-6 pb-16 px-5 bg-gray-50">
         <div className="flex items-center gap-x-1.5">
           <Check />
           <div className="font-sans text-lg font-semibold text-gray-900">
@@ -207,7 +237,11 @@ export default function Page() {
                   getDatetime(reservation.date, reservation.time)
                 ) > 7 && (
                   <div
-                    onClick={() => handleCancel(reservation.id)}
+                    onClick={() => {
+                      setSelectedId(reservation.id);
+                      setAction("cancel");
+                      setIsOpen(true);
+                    }}
                     className="flex w-full items-center justify-center rounded-xl bg-white border border-1 border-cyan-600/90 font-sans font-medium text-cyan-600/90 mt-2 px-4 py-2"
                   >
                     취소하기
@@ -218,9 +252,11 @@ export default function Page() {
                 ) > 3 &&
                   !reservation.change_at && (
                     <div
-                      onClick={() =>
-                        router.push(`/reserve?id=${reservation.id}`)
-                      }
+                      onClick={() => {
+                        setSelectedId(reservation.id);
+                        setAction("change");
+                        setIsOpen(true);
+                      }}
                       className="flex w-full items-center justify-center rounded-xl bg-cyan-500/90 font-sans font-medium text-white mt-2 px-4 py-2"
                     >
                       변경하기
@@ -248,6 +284,37 @@ export default function Page() {
             )}
           </div>
         ))}
+
+        {isOpen && (
+          <div
+            onClick={() => setIsOpen(false)}
+            className="fixed inset-0 flex items-center justify-center bg-black/50"
+          >
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="flex flex-col gap-y-4 w-2/3 bg-white rounded-xl shadow-md px-5 py-5"
+            >
+              <div className="flex flex-col gap-y-1.5">
+                <div className="font-sans font-bold text-gray-700">
+                  비밀번호
+                </div>
+                <input
+                  type="password"
+                  placeholder="비밀번호 4자리를 입력해주세요"
+                  onChange={(e) => setPassword(e.target.value)}
+                  maxLength={4}
+                  className="w-full h-8 rounded-lg bg-gray-50 px-2 py-1"
+                />
+              </div>
+              <div
+                onClick={handleCheck}
+                className="flex w-full items-center justify-center rounded-xl bg-cyan-500/90 font-sans font-medium text-white mt-2 px-4 py-2"
+              >
+                확인
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
