@@ -5,7 +5,7 @@ import { Check } from "../../../components/icons";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import supabase from "@root/supabase.config";
-import { notFound } from "next/navigation";
+// import { notFound } from "next/navigation";
 
 type Reservation = {
   id: number;
