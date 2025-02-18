@@ -5,6 +5,7 @@ import { Check } from "../../../components/icons";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import supabase from "@root/supabase.config";
+import { notFound } from "next/navigation";
 
 type Reservation = {
   id: number;
@@ -22,29 +23,34 @@ type Reservation = {
 export default function Page() {
   const router = useRouter();
   const params = useSearchParams();
-  const ids = params.get("ids").split(",");
   const [reservations, setReservations] = useState<Reservation[]>([]);
 
-  // TODO : 브라우저가 멈추지 않고 요청을 보냄
   useEffect(() => {
-    const getReservations = async () => {
-      const { data, error } = await supabase
-        .from("reservation")
-        .select(
-          "id, name, date, time, option, request, created_at, change_at, cancel_at, password"
-        )
-        .in("id", ids);
-      if (error) {
-        alert(
-          "예약 내역을 불러오는 중 오류가 발생했습니다. 다시 시도해주세요."
-        );
-        return;
-      }
-      setReservations(data);
-    };
+    const ids = params.get("ids")?.split(",");
+    // if (!ids || ids.map((id) => isNaN(parseInt(id, 10)))) {
+    //   notFound();
+    // }
 
-    getReservations();
-  }, [ids]);
+    if (ids) {
+      const getReservations = async () => {
+        const { data, error } = await supabase
+          .from("reservation")
+          .select(
+            "id, name, date, time, option, request, created_at, change_at, cancel_at, password"
+          )
+          .in("id", ids);
+        if (error) {
+          alert(
+            "예약 내역을 불러오는 중 오류가 발생했습니다. 다시 시도해주세요."
+          );
+          return;
+        }
+        setReservations(data);
+      };
+
+      getReservations();
+    }
+  }, [params]);
 
   const getDatetime = (selectedDate: Date, selectedTime: Date) => {
     const date = new Date(selectedDate);
