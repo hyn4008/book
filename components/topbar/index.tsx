@@ -12,7 +12,7 @@ function Topbar({
   elements?: { left?: ReactElement; right?: ReactElement };
 }) {
   return (
-    <header className="fixed top-0 z-100 flex items-center bg-white border px-4 py-3 w-full">
+    <header className="fixed top-0 z-50 flex items-center bg-white border px-4 py-3 w-full max-w-[600px]">
       <div className="flex w-full justify-start">{left}</div>
       <div className="flex w-full justify-center text-lg font-semibold text-gray-800">
         {title}

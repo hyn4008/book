@@ -12,7 +12,7 @@ import Jan4 from "./_static/2025_01_4.jpeg";
 
 export default function Home() {
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-screen max-w-[600px]">
       <Topbar title={"Étoile Nail"} elements={{ right: <Topbar.Check /> }} />
       <main className="flex flex-col pt-14">
         <section className="relative flex flex-col">

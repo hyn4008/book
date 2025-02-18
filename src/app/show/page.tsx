@@ -49,7 +49,14 @@ export default function Page() {
           );
           return;
         }
-        setReservations(data);
+        // data.time을 +9시간으로 세팅
+        const adjustedData = data.map((reservation) => {
+          const adjustedTime = new Date(reservation.time);
+          adjustedTime.setHours(adjustedTime.getHours() + 9);
+          return { ...reservation, time: adjustedTime };
+        });
+
+        setReservations(adjustedData);
       };
 
       getReservations();

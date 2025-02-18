@@ -20,16 +20,14 @@ export default function Page() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
-  const [date, setDate] = useState({
-    startDate: new Date(),
-    endDate: new Date(),
-  });
-  const [time, setTime] = useState({ value: "10:00", label: "10:00" });
+  const [date, setDate] = useState<{ startDate: Date; endDate: Date }>({});
+  const [time, setTime] = useState<{ value: string; label: string }>({});
   const [option, setOption] = useState<string[]>([]);
   const [request, setRequest] = useState("");
   const [disabledDates, setDisabledDates] = useState<
     { startDate: Date; endDate: Date }[]
   >([]);
+  const [disabledTimes, setDisabledTimes] = useState<string[]>([]);
 
   const params = useSearchParams();
   const id = params.get("id");
@@ -73,19 +71,6 @@ export default function Page() {
 
   const router = useRouter();
 
-  const times = [
-    { value: "10:00", label: "10:00" },
-    { value: "11:00", label: "11:00" },
-    { value: "12:00", label: "12:00" },
-    { value: "13:00", label: "13:00" },
-    { value: "14:00", label: "14:00" },
-    { value: "15:00", label: "15:00" },
-    { value: "16:00", label: "16:00" },
-    { value: "17:00", label: "17:00" },
-    { value: "18:00", label: "18:00" },
-    { value: "19:00", label: "19:00" },
-  ];
-
   // startDate부터 endDate까지의 모든 화요일을 반환
   const getAllTuesdays = ({
     startDate,
@@ -121,17 +106,64 @@ export default function Page() {
     setDisabledDates(getAllTuesdays({ startDate, endDate }));
   }, []);
 
+  const times = [
+    { value: "10:00", label: "10:00" },
+    { value: "11:00", label: "11:00" },
+    { value: "12:00", label: "12:00" },
+    { value: "13:00", label: "13:00" },
+    { value: "14:00", label: "14:00" },
+    { value: "15:00", label: "15:00" },
+    { value: "16:00", label: "16:00" },
+    { value: "17:00", label: "17:00" },
+    { value: "18:00", label: "18:00" },
+    { value: "19:00", label: "19:00" },
+  ];
+
+  // 선택된 날짜에 이미 예약된 시간 가져오기
+  useEffect(() => {
+    const getDisabledTimes = async () => {
+      const formattedDate = getDate(date).toISOString();
+
+      const { data, error } = await supabase
+        .from("reservation")
+        .select("time")
+        .eq("date", formattedDate)
+        .is("cancel_at", null);
+
+      if (error) {
+        console.error("예약된 시간을 불러오는 중 오류가 발생했습니다.");
+        return;
+      }
+
+      const times = data.map((reservation) => {
+        const time = new Date(reservation.time);
+        time.setHours(time.getHours() + 9);
+        const hours = time.getHours().toString().padStart(2, "0");
+        const minutes = time.getMinutes().toString().padStart(2, "0");
+        return `${hours}:${minutes}`;
+      });
+
+      setDisabledTimes(times);
+    };
+    getDisabledTimes();
+  }, [date]);
+
+  // 이미 예약된 시간을 제외하고 예약 가능한 시간만 추출하여 배열로 반환
+  const availableTimes = times.filter(
+    (time) => !disabledTimes.includes(time.value)
+  );
+
   // Date 객체에서 시간 정보를 제외하고 날짜만 반환
-  const getDate = ({ date }: { date: { startDate: Date; endDate: Date } }) => {
+  const getDate = (date: { startDate: Date; endDate: Date }) => {
     return new Date(
       date.startDate.getFullYear(),
       date.startDate.getMonth(),
-      date.startDate.getDate()
+      date.startDate.getDate() + 1 // timezone 반영되면, 9시간 전인 전날 15시로 세팅되기 때문에 1일 추가
     );
   };
 
   // "HH:mm" 형식의 시간을 Date 객체로 변환
-  const getTime = ({ time }: { time: { value: string; label: string } }) => {
+  const getTime = (time: { value: string; label: string }) => {
     const [hour, minute] = time.value.split(":");
     return new Date(`1999/12/31/${hour}:${minute}:0`); // 1999년 12월 31일 HH:mm:00
   };
@@ -173,8 +205,8 @@ export default function Page() {
           name: name,
           phone: phone,
           password: password,
-          date: getDate({ date }),
-          time: getTime({ time }),
+          date: getDate(date),
+          time: getTime(time),
           option: option,
           request: request,
           change_at: new Date(),
@@ -183,6 +215,7 @@ export default function Page() {
 
       if (error) {
         alert("예약 변경에 실패했습니다. 다시 시도해주세요.");
+        console.log(error);
       } else {
         alert("예약이 변경되었습니다.");
         router.push("/");
@@ -192,8 +225,8 @@ export default function Page() {
         name: name,
         phone: phone,
         password: password,
-        date: getDate({ date }),
-        time: getTime({ time }),
+        date: getDate(date),
+        time: getTime(time),
         option: option,
         request: request,
       });
@@ -302,7 +335,7 @@ export default function Page() {
                 placeholder="Select Time"
                 value={time}
                 onChange={(e) => setTime(e)}
-                options={times}
+                options={availableTimes}
                 isSearchable={false}
                 primaryColor={"cyan"}
                 classNames={{
