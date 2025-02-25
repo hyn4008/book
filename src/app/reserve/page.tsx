@@ -1,10 +1,11 @@
 "use client";
 import supabase from "@root/supabase.config";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import Datepicker from "react-tailwindcss-datepicker";
 import Select from "react-tailwindcss-select";
 import Topbar from "../../../components/topbar";
+import { SelectValue } from "react-tailwindcss-select/dist/components/type";
 
 // type Reservation = {
 //   name: string;
@@ -16,18 +17,18 @@ import Topbar from "../../../components/topbar";
 //   request: string;
 // };
 
-export default function Page() {
+function ReservationContent() {
 	const [name, setName] = useState("");
 	const [phone, setPhone] = useState("");
 	const [password, setPassword] = useState("");
 	const [date, setDate] = useState<{
 		startDate: Date | null;
 		endDate: Date | null;
-	}>({ startDate: null, endDate: null });
+	} | null>(null);
 	const [time, setTime] = useState<{
-		value: string | null;
-		label: string | null;
-	}>({ value: null, label: null });
+		value: string;
+		label: string;
+	} | null>(null);
 	const [option, setOption] = useState<string[]>([]);
 	const [request, setRequest] = useState("");
 	const [disabledDates, setDisabledDates] = useState<
@@ -128,7 +129,7 @@ export default function Page() {
 	// 선택된 날짜에 이미 예약된 시간 가져오기
 	useEffect(() => {
 		const getDisabledTimes = async () => {
-			if (date.startDate) {
+			if (date) {
 				const formattedDate = getDate(date)?.toISOString();
 
 				const { data, error } = await supabase
@@ -163,7 +164,7 @@ export default function Page() {
 
 	// Date 객체에서 시간 정보를 제외하고 날짜만 반환
 	const getDate = (date: { startDate: Date | null; endDate: Date | null }) => {
-		if (!date.startDate) {
+		if (!date || !date.startDate) {
 			console.log("선택된 날짜가 없습니다.");
 			return;
 		}
@@ -176,12 +177,7 @@ export default function Page() {
 	};
 
 	// "HH:mm" 형식의 시간을 Date 객체로 변환
-	const getTime = (time: { value: string | null; label: string | null }) => {
-		if (!time.value) {
-			console.log("선택된 시간이 없습니다.");
-			return;
-		}
-
+	const getTime = (time: { value: string; label: string }) => {
 		const [hour, minute] = time.value.split(":");
 		return new Date(`1999/12/31/${hour}:${minute}:0`); // 1999년 12월 31일 HH:mm:00
 	};
@@ -334,8 +330,8 @@ export default function Page() {
 								useRange={false}
 								asSingle={true}
 								placeholder="Select Date"
-								value={date.startDate ? date : null}
-								onChange={(e) => setDate(e)}
+								value={date}
+								onChange={(e) => setDate(e ? { startDate: e.startDate, endDate: e.endDate } : null)}
 								minDate={new Date()}
 								disabledDates={disabledDates}
 								primaryColor={"cyan"}
@@ -348,8 +344,8 @@ export default function Page() {
 							/>
 							<Select
 								placeholder="Select Time"
-								value={time.value ? time : null}
-								onChange={(e) => setTime(e)}
+								value={time}
+								onChange={(e: SelectValue) => setTime(e as { value: string; label: string } | null)}
 								options={availableTimes}
 								isSearchable={false}
 								primaryColor={"cyan"}
@@ -461,5 +457,13 @@ export default function Page() {
 				</div>
 			</main>
 		</div>
+	);
+}
+
+export default function Page() {
+	return (
+		<Suspense fallback={<div>Loading...</div>}>
+			<ReservationContent />
+		</Suspense>
 	);
 }

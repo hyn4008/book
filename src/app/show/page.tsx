@@ -2,10 +2,9 @@
 import supabase from "@root/supabase.config";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Check } from "../../../components/icons";
 import Topbar from "../../../components/topbar";
-// import { notFound } from "next/navigation";
 
 type Reservation = {
 	id: number;
@@ -20,7 +19,7 @@ type Reservation = {
 	password: string;
 };
 
-export default function Page() {
+function ShowContent() {
 	const router = useRouter();
 	const params = useSearchParams();
 	const [reservations, setReservations] = useState<Reservation[]>([]);
@@ -317,5 +316,20 @@ export default function Page() {
 				)}
 			</main>
 		</div>
+	);
+}
+
+export default function Page() {
+	return (
+		<Suspense fallback={
+			<div className="flex flex-col min-h-screen">
+				<Topbar title={"Étoile Nail"} elements={{ left: <Topbar.Back /> }} />
+				<main className="flex flex-col gap-y-4 mt-10 pt-6 pb-16 px-5 bg-gray-50">
+					<div>로딩중...</div>
+				</main>
+			</div>
+		}>
+			<ShowContent />
+		</Suspense>
 	);
 }
