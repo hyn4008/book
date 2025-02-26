@@ -1,11 +1,11 @@
 "use client";
 import supabase from "@root/supabase.config";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState, Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Datepicker from "react-tailwindcss-datepicker";
 import Select from "react-tailwindcss-select";
+import type { SelectValue } from "react-tailwindcss-select/dist/components/type";
 import Topbar from "../../../components/topbar";
-import { SelectValue } from "react-tailwindcss-select/dist/components/type";
 
 // type Reservation = {
 //   name: string;
@@ -145,7 +145,6 @@ function ReservationContent() {
 
 				const times = data.map((reservation) => {
 					const time = new Date(reservation.time);
-					time.setHours(time.getHours() + 9);
 					const hours = time.getHours().toString().padStart(2, "0");
 					const minutes = time.getMinutes().toString().padStart(2, "0");
 					return `${hours}:${minutes}`;
@@ -331,7 +330,11 @@ function ReservationContent() {
 								asSingle={true}
 								placeholder="Select Date"
 								value={date}
-								onChange={(e) => setDate(e ? { startDate: e.startDate, endDate: e.endDate } : null)}
+								onChange={(e) =>
+									setDate(
+										e ? { startDate: e.startDate, endDate: e.endDate } : null,
+									)
+								}
 								minDate={new Date()}
 								disabledDates={disabledDates}
 								primaryColor={"cyan"}
@@ -345,7 +348,9 @@ function ReservationContent() {
 							<Select
 								placeholder="Select Time"
 								value={time}
-								onChange={(e: SelectValue) => setTime(e as { value: string; label: string } | null)}
+								onChange={(e: SelectValue) =>
+									setTime(e as { value: string; label: string } | null)
+								}
 								options={availableTimes}
 								isSearchable={false}
 								primaryColor={"cyan"}
